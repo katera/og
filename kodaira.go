@@ -3,7 +3,6 @@ package og
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -158,7 +157,12 @@ func extractFromUrl(ctx context.Context, u string) (*OpenGraph, error) {
 	}
 	defer resp.Body.Close()
 
-	htmlTokenized := html.NewTokenizer(resp.Body)
+	return extractOpenGraph(resp.Body)
+}
+
+func extractOpenGraph(data io.Reader) (*OpenGraph, error) {
+
+	htmlTokenized := html.NewTokenizer(data)
 	metaContent := []meta{}
 	running := true
 	for running {
@@ -207,7 +211,7 @@ func extractFromUrl(ctx context.Context, u string) (*OpenGraph, error) {
 	return marshallFromMap(metaContent), nil
 }
 
-//READ : http://ogp.me/
+//Reff: http://ogp.me/
 func marshallFromMap(data []meta) *OpenGraph {
 	og := &OpenGraph{}
 	imgs := []*Image{}
@@ -252,6 +256,8 @@ func marshallFromMap(data []meta) *OpenGraph {
 			og.Type = m.Content
 		case "og:url":
 			og.Url = m.Content
+		case "og:locale":
+			og.Locale = m.Content
 		case "og:site":
 			og.Site = m.Content
 		case "og:site_name":
@@ -442,7 +448,6 @@ func marshallFromMap(data []meta) *OpenGraph {
 			alIphone.Url = m.Content
 		default:
 			if m.Name == "" {
-				fmt.Printf(">>>> %s : %s\n ", m.Name, m.Content)
 				continue
 			}
 			otherMetas[m.Name] = m.Content
@@ -474,6 +479,7 @@ func removeWhiteSpace(s string) string {
 	return res
 }
 
-func GetOpenGraphFromHtml(h string) {
-
+func GetOpenGraphFromHtml(h string) (*OpenGraph, error) {
+	data := strings.NewReader(h)
+	return extractOpenGraph(data)
 }
