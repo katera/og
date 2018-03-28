@@ -106,7 +106,6 @@ type OpenGraph struct {
 	Twitter     *TwitterCard      `json:"twitter_card"`
 	AlDevices   []*DeviceCard     `json:"device"`
 	Others      map[string]string `json:"others"`
-	// Content     string       `json:"content"`
 }
 
 func isUrlValid(u string) bool {
@@ -183,7 +182,6 @@ func extractOpenGraph(data io.Reader) (*OpenGraph, error) {
 			}
 
 			if string(name) == "body" {
-				// TODO: Fix this
 				running = false // <body></body> skipped. We just need <head>
 				break
 			}
@@ -271,12 +269,14 @@ func marshallFromMap(data []meta) *OpenGraph {
 				imgs[len(imgs)-1].URL = m.Content
 			}
 		case "og:image:width":
-			w, _ := strconv.ParseInt(m.Content, 10, 64)
+			c := removeWhiteSpace(m.Content)
+			w, _ := strconv.ParseInt(c, 10, 64)
 			if len(imgs) > 0 {
 				imgs[len(imgs)-1].Width = int(w)
 			}
 		case "og:image:height":
-			h, _ := strconv.ParseInt(m.Content, 10, 64)
+			c := removeWhiteSpace(m.Content)
+			h, _ := strconv.ParseInt(c, 10, 64)
 			if len(imgs) > 0 {
 				imgs[len(imgs)-1].Height = int(h)
 			}
@@ -317,12 +317,15 @@ func marshallFromMap(data []meta) *OpenGraph {
 			}
 		case "og:video:width":
 			if len(videos) > 0 {
-				w, _ := strconv.ParseInt(m.Content, 10, 64)
+				c := removeWhiteSpace(m.Content)
+				w, _ := strconv.ParseInt(c, 10, 64)
+
 				videos[len(videos)-1].Width = int(w)
 			}
 		case "og:video:height":
 			if len(videos) > 0 {
-				h, _ := strconv.ParseInt(m.Content, 10, 64)
+				c := removeWhiteSpace(m.Content)
+				h, _ := strconv.ParseInt(c, 10, 64)
 				videos[len(videos)-1].Height = int(h)
 			}
 		case "article:tag":
