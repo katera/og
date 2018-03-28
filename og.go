@@ -14,6 +14,10 @@ import (
 	"golang.org/x/net/html"
 )
 
+var (
+	ErrContextNil = errors.New("Context is nil")
+)
+
 type Article struct {
 	PublishedTime  *time.Time `json:"published_time"`
 	ModifiedTime   *time.Time `json:"modified_time"`
@@ -143,23 +147,25 @@ type meta struct {
 func extractFromUrl(ctx context.Context, u string) (*OpenGraph, error) {
 	client := http.Client{}
 
+	if ctx == nil {
+		return nil, ErrContextNil
+	}
+
 	req, err := http.NewRequest(http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
 	}
-	if ctx != nil {
-		req.WithContext(ctx)
-	}
+	req.WithContext(ctx)
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	return extractOpenGraph(resp.Body)
+	return extractOpenGraph(ctx, resp.Body)
 }
 
-func extractOpenGraph(data io.Reader) (*OpenGraph, error) {
+func extractOpenGraph(ctx context.Context, data io.Reader) (*OpenGraph, error) {
 
 	htmlTokenized := html.NewTokenizer(data)
 	metaContent := []meta{}
@@ -206,11 +212,11 @@ func extractOpenGraph(data io.Reader) (*OpenGraph, error) {
 
 	}
 
-	return marshallFromMap(metaContent), nil
+	return marshallFromMap(ctx, metaContent), nil
 }
 
 //Reff: http://ogp.me/
-func marshallFromMap(data []meta) *OpenGraph {
+func marshallFromMap(ctx context.Context, data []meta) *OpenGraph {
 	og := &OpenGraph{}
 	imgs := []*Image{}
 	videos := []*Video{}
@@ -484,5 +490,14 @@ func removeWhiteSpace(s string) string {
 
 func GetOpenGraphFromHtml(h string) (*OpenGraph, error) {
 	data := strings.NewReader(h)
-	return extractOpenGraph(data)
+	ctx := context.Background()
+	return extractOpenGraph(ctx, data)
+}
+
+func GetOpenGraphFromHtmlContext(ctx context.Context, h string) (*OpenGraph, error) {
+	data := strings.NewReader(h)
+	if ctx == nil {
+		return nil, ErrContextNil
+	}
+	return extractOpenGraph(ctx, data)
 }
