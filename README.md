@@ -218,7 +218,7 @@ func main() {
 	</html>
  `
 
- res, err := og.GetOpenGraphFromUrl("https://hackernoon.com/golang-clean-archithecture-efd6d7c43047")
+ res, err := og.GetOpenGraphFromUrl(htmlString)
  
  if err != nil {
   log.Fatal(err)
