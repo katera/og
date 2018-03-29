@@ -218,7 +218,7 @@ func main() {
 	</html>
  `
 
- res, err := og.GetOpenGraphFromUrl(htmlString)
+ res, err := og.GetOpenGraphFromHtml(htmlString)
  
  if err != nil {
   log.Fatal(err)
