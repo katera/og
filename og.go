@@ -125,7 +125,7 @@ func GetOpenGraphFromUrl(u string) (*OpenGraph, error) {
 		return nil, errors.New("Given Url is not valid")
 	}
 
-	return extractFromUrl(context.Background(), u)
+	return GetOpenGraphFromUrlContext(context.Background(), u)
 }
 
 func GetOpenGraphFromUrlContext(ctx context.Context, u string) (*OpenGraph, error) {
@@ -489,9 +489,8 @@ func removeWhiteSpace(s string) string {
 }
 
 func GetOpenGraphFromHtml(h string) (*OpenGraph, error) {
-	data := strings.NewReader(h)
-	ctx := context.Background()
-	return extractOpenGraph(ctx, data)
+
+	return GetOpenGraphFromHtmlContext(context.Background(), h)
 }
 
 func GetOpenGraphFromHtmlContext(ctx context.Context, h string) (*OpenGraph, error) {
