@@ -5,7 +5,8 @@ Open Graph Extractor written in Golang
 
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/katera/og/blob/master/LICENSE)
 [![GoDoc](https://godoc.org/github.com/katera/og?status.svg)](https://godoc.org/github.com/katera/og)
-
+[![codecov](https://codecov.io/gh/katera/og/branch/master/graph/badge.svg)](https://codecov.io/gh/katera/og)
+[![Build Status](https://travis-ci.org/katera/og.svg?branch=master)](https://travis-ci.org/katera/og)
 ## Index
 
 * [Support](#support)
